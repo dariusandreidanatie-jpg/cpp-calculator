@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ Calculator Terminal</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #080d0a;
+    color: #b4e9c1;
+    font-family: Consolas, "Courier New", monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .terminal {
+    width: 100%;
+    max-width: 750px;
+    background: #101812;
+    border: 1px solid #285b39;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 40px #00ff4410;
+  }
+
+  .topbar {
+    background: #1b2820;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .red { background: #ff5f57; }
+  .yellow { background: #febc2e; }
+  .green { background: #28c840; }
+
+  .topbar span {
+    margin-left: auto;
+    color: #8cba98;
+    font-size: 12px;
+  }
+
+  .content { padding: 25px; }
+
+  h1 {
+    color: #45f58a;
+    font-size: 23px;
+  }
+
+  .prompt { color: #45f58a; }
+
+  label {
+    display: block;
+    margin: 18px 0 8px;
+    color: #45f58a;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    background: #080d0a;
+    border: 1px solid #285b39;
+    border-radius: 5px;
+    color: #45f58a;
+    font: inherit;
+    outline: none;
+  }
+
+  input:focus { border-color: #45f58a; }
+
+  button {
+    margin-top: 22px;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 5px;
+    background: #45f58a;
+    color: #08100a;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover { background: #8bffb2; }
+
+  #output {
+    display: none;
+    margin-top: 25px;
+    padding: 18px;
+    background: #0d1b12;
+    border: 1px solid #285b39;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.8;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 9px;
+    height: 16px;
+    background: #45f58a;
+    vertical-align: middle;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+<div class="terminal">
+  <div class="topbar">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+    <span>calculator.exe</span>
+  </div>
+
+  <div class="content">
+    <p class="prompt">root@calculator:~$ ./calculator</p>
+    <h1>C++ CALCULATOR v1.0</h1>
+    <p>Enter two numbers to begin.</p>
+
+    <form id="calculator">
+      <label for="a">Enter Number 1:</label>
+      <input id="a" type="number" step="1"
+             required placeholder="e.g. 12">
+
+      <label for="b">Enter Number 2:</label>
+      <input id="b" type="number" step="1"
+             required placeholder="e.g. 5">
+
+      <button type="submit">&gt; EXECUTE</button>
+    </form>
+
+    <div id="output" aria-live="polite"></div>
+
+    <p class="prompt">
+      root@calculator:~$ <span class="cursor"></span>
+    </p>
+  </div>
+</div>
+
+<script>
+function isPrime(n) {
+  if (n < 2) return false;
+  if (n === 2) return true;
+  if (n % 2 === 0) return false;
+
+  for (let i = 3; i <= Math.sqrt(n); i += 2) {
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+
+document.getElementById("calculator")
+  .addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const a = Number(document.getElementById("a").value);
+    const b = Number(document.getElementById("b").value);
+    const output = document.getElementById("output");
+
+    if (!Number.isSafeInteger(a) || !Number.isSafeInteger(b)) {
+      output.style.display = "block";
+      output.textContent = "ERROR: Enter valid, safe integers.";
+      return;
+    }
+
+    const biggest = Math.max(a, b);
+    const smallest = Math.min(a, b);
+
+    let result = "-----------------------------------------\n";
+    result += "Biggest Number: " + biggest + "\n";
+    result += "Smallest Number: " + smallest + "\n";
+
+    if (a === b) {
+      result += "Comparison: Both numbers are equal\n";
+    } else {
+      result += "Comparison: " + smallest +
+                " < " + biggest + "\n";
+    }
+
+    result += "The Sum: " + (a + b) + "\n";
+    result += "Subtraction: " + (a - b) + "\n";
+    result += "Positive Subtraction: " +
+              Math.abs(a - b) + "\n";
+    result += "Multiplication: " + (a * b) + "\n";
+
+    if (b !== 0) {
+      result += "Division: " + (a / b) + "\n";
+    } else {
+      result += "Division: Cannot divide by zero\n";
+    }
+
+    if (b !== 0 && a % b === 0) {
+      result += a + " is divisible by " + b + "\n";
+    }
+
+    if (a !== 0 && b % a === 0) {
+      result += b + " is divisible by " + a + "\n";
+    }
+
+    result += a + (isPrime(a)
+      ? " is prime\n" : " is not prime\n");
+
+    result += b + (isPrime(b)
+      ? " is prime\n" : " is not prime\n");
+
+    result += "-----------------------------------------\n";
+    result += "Process finished successfully.";
+
+    output.textContent = result;
+    output.style.display = "block";
+  });
+</script>
+</body>
+</html>
